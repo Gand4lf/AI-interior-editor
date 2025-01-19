@@ -1,10 +1,5 @@
 import { auth, db, storage } from "./firebase";
 import {
-  signOut,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
-import {
   collection,
   addDoc,
   getDocs,
@@ -19,18 +14,6 @@ import { ref, uploadBytes, getDownloadURL, uploadString } from "firebase/storage
 import { HistoryEntry, DesignSession } from "../types";
 
 // Auth functions
-export const logoutUser = () => signOut(auth);
-
-export const signInWithGoogle = async () => {
-  const provider = new GoogleAuthProvider();
-  try {
-    const result = await signInWithPopup(auth, provider);
-    return result.user;
-  } catch (error) {
-    console.error("Error signing in with Google", error);
-    throw error;
-  }
-};
 
 // Save a new design session
 export async function saveDesignSession(session: DesignSession) {

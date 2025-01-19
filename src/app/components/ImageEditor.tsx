@@ -8,7 +8,6 @@ import { AIInputWithLoading } from "./ui/ai-input-with-loading";
 import ImageUploader from './ImageUploader';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/lib/redux/store';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { HistoryEntry } from '@/lib/types';
 
 type EditMode = 'view' | 'draw';
