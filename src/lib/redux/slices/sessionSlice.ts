@@ -10,44 +10,50 @@ interface SessionState {
 
 // Load initial state from localStorage
 const loadState = (): SessionState => {
+    const defaultState = {
+        sessions: [],
+        currentSessionId: null,
+        currentImage: null,
+        history: []
+    };
+
     if (typeof window === 'undefined') {
-        return {
-            sessions: [],
-            currentSessionId: null,
-            currentImage: null,
-            history: []
-        };
+        return defaultState;
     }
 
     const savedState = localStorage.getItem('sessionState');
     if (!savedState) {
-        return {
-            sessions: [],
-            currentSessionId: null,
-            currentImage: null,
-            history: []
-        };
+        return defaultState;
     }
 
-    const parsedState = JSON.parse(savedState);
-    // Convert date strings back to Date objects
-    parsedState.sessions.forEach((session: DesignSession) => {
-        session.timestamp = new Date(session.timestamp);
-        session.history.forEach((entry: HistoryEntry) => {
+    try {
+        const parsedState = JSON.parse(savedState);
+        // Convert date strings back to Date objects
+        parsedState.sessions.forEach((session: DesignSession) => {
+            session.timestamp = new Date(session.timestamp);
+            session.history.forEach((entry: HistoryEntry) => {
+                entry.timestamp = new Date(entry.timestamp);
+            });
+        });
+        parsedState.history.forEach((entry: HistoryEntry) => {
             entry.timestamp = new Date(entry.timestamp);
         });
-    });
-    parsedState.history.forEach((entry: HistoryEntry) => {
-        entry.timestamp = new Date(entry.timestamp);
-    });
 
-    return parsedState;
+        return parsedState;
+    } catch (error) {
+        console.error('Error parsing session state:', error);
+        return defaultState;
+    }
 };
 
 // Save state to localStorage
 const saveState = (state: SessionState) => {
     if (typeof window !== 'undefined') {
-        localStorage.setItem('sessionState', JSON.stringify(state));
+        try {
+            localStorage.setItem('sessionState', JSON.stringify(state));
+        } catch (error) {
+            console.error('Error saving session state:', error);
+        }
     }
 };
 
