@@ -19,6 +19,8 @@ interface ImageEditorProps {
     onUpdateHistory: (newEntry: HistoryEntry) => void;
     onImageChange: (imageUrl: string) => void;
     setIsLoading: (loading: boolean) => void;
+    generationCount: number;
+    setGenerationCount: (count: number) => void;
 }
 
 export default function ImageEditor({
@@ -26,12 +28,13 @@ export default function ImageEditor({
     history,
     onUpdateHistory,
     onImageChange,
-    setIsLoading
+    setIsLoading,
+    generationCount,
+    setGenerationCount
 }: ImageEditorProps) {
     const [editMode, setEditMode] = useState<EditMode>('view');
     const [maskImage, setMaskImage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const generationCount = useSelector((state: RootState) => state.generation.count);
 
     const handleLogin = async () => {
         const auth = getAuth();
