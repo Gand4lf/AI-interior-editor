@@ -74,24 +74,17 @@ export default function ImageEditor({
                 return;
             }
 
+            // Upload current image if it's not already a URL
             let imageUrl = currentImage;
-            let maskUrl = null;
-
-            // Always upload the image to ensure we have a proper URL
             if (!currentImage.startsWith('http')) {
                 const uploadResponse = await fetch('/api/upload', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        image: currentImage,
-                    }),
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: currentImage }),
                 });
 
                 if (!uploadResponse.ok) {
-                    const error = await uploadResponse.json();
-                    throw new Error(error.error || 'Failed to upload image');
+                    throw new Error('Failed to upload image');
                 }
 
                 const uploadData = await uploadResponse.json();
@@ -99,15 +92,13 @@ export default function ImageEditor({
                 console.log('Image uploaded:', imageUrl);
             }
 
+            // Always upload mask if it exists (since it's coming from canvas as base64)
+            let maskUrl = null;
             if (maskImage) {
                 const maskUploadResponse = await fetch('/api/upload', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        image: maskImage,
-                    }),
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: maskImage }),
                 });
 
                 if (!maskUploadResponse.ok) {
@@ -138,8 +129,9 @@ export default function ImageEditor({
             });
 
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || 'Failed to edit image');
+                const errorData = await response.json();
+                console.error('Generation error:', errorData);
+                throw new Error(errorData.error || 'Failed to edit image');
             }
 
             const data = await response.json();
