@@ -188,7 +188,7 @@ export default function ImageEditor({
 
     const getPromptPlaceholder = () => {
         if (!currentImage) {
-            return "Describe the image you want to generate...";
+            return "Describe the room/building you want to generate...";
         }
         if (editMode === 'draw') {
             return "Describe what to add or change in the selected areas (e.g., 'Add a modern leather sofa')";

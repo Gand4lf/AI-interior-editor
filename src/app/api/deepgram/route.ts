@@ -3,7 +3,8 @@ import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-    return NextResponse.json({
-      key: process.env.DEEPGRAM_API_KEY ?? "",
-    });
+    return NextResponse.json(
+        { error: "Speech-to-text service is not available" },
+        { status: 501 }
+    );
 }
