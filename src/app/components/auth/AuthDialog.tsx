@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '../ui/button';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { Chrome } from 'lucide-react';
@@ -30,7 +30,7 @@ export function AuthDialog({ isOpen, onClose }: AuthDialogProps) {
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogClose open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Continue with AIchitect</DialogTitle>
