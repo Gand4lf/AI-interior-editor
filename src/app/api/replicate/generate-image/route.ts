@@ -5,9 +5,34 @@ const replicate = new Replicate({
     auth: process.env.REPLICATE_API_TOKEN,
 });
 
+// Validate URL format
+const isValidUrl = (url: string) => {
+    try {
+        new URL(url);
+        return url.startsWith('http://') || url.startsWith('https://');
+    } catch {
+        return false;
+    }
+};
+
 export async function POST(req: Request) {
     try {
         const { prompt, image, mask, controlnet, inpaint } = await req.json();
+
+        // Validate URLs if provided
+        if (image && !isValidUrl(image)) {
+            return NextResponse.json(
+                { error: 'Invalid image URL format' },
+                { status: 400 }
+            );
+        }
+
+        if (mask && !isValidUrl(mask)) {
+            return NextResponse.json(
+                { error: 'Invalid mask URL format' },
+                { status: 400 }
+            );
+        }
 
         let prediction;
         
@@ -33,8 +58,8 @@ export async function POST(req: Request) {
                 {
                     input: {
                         prompt: `${prompt}, super detailed, realistic, 8k`,
-                        image,
-                        mask,
+                        image: image.trim(),
+                        mask: mask.trim(),
                         num_inference_steps: 30,
                         scheduler: "DPM++ 2M Karras",
                         strength: 0.99,
@@ -50,7 +75,7 @@ export async function POST(req: Request) {
                 {
                     input: {
                         prompt: `${prompt}, super detailed, realistic, 8k`,
-                        control_image: image,
+                        control_image: image.trim(),
                         num_inference_steps: 30,
                         guidance_scale: 7.5,
                         num_samples: 1,

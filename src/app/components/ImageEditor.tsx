@@ -77,7 +77,8 @@ export default function ImageEditor({
             let imageUrl = currentImage;
             let maskUrl = null;
 
-            if (currentImage.startsWith('data:')) {
+            // Always upload the image to ensure we have a proper URL
+            if (!currentImage.startsWith('http')) {
                 const uploadResponse = await fetch('/api/upload', {
                     method: 'POST',
                     headers: {
@@ -118,18 +119,22 @@ export default function ImageEditor({
                 console.log('Mask uploaded:', maskUrl);
             }
 
+            // Log the request payload for debugging
+            const requestPayload = {
+                prompt: value,
+                image: imageUrl,
+                mask: maskUrl,
+                controlnet: !maskUrl,
+                inpaint: !!maskUrl,
+            };
+            console.log('Request payload:', requestPayload);
+
             const response = await fetch('/api/replicate/generate-image', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    prompt: value,
-                    image: imageUrl,
-                    mask: maskUrl,
-                    controlnet: !maskUrl,
-                    inpaint: !!maskUrl,
-                }),
+                body: JSON.stringify(requestPayload),
             });
 
             if (!response.ok) {
