@@ -7,8 +7,6 @@ import ImageEditor from './components/ImageEditor';
 import { cn } from '@/lib/utils';
 import { ConfirmationDialog } from './components/ui/confirmation-dialog';
 import { Button } from './components/ui/button';
-import { useAuth } from '@/lib/hooks/useAuth';
-import { getUserSessions, saveDesignSession, updateDesignSession, uploadImage } from '@/lib/firebase/firebaseUtils';
 import type { DesignSession, HistoryEntry } from '../lib/types';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import {
@@ -22,58 +20,13 @@ import {
   setCount
 } from '@/lib/redux/store';
 
-
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [deleteSession, setDeleteSession] = useState<DesignSession | null>(null);
-  const { user } = useAuth();
 
   const dispatch = useAppDispatch();
   const { sessions, currentSessionId, currentImage, history } = useAppSelector(state => state.session);
   const generationCount = useAppSelector(state => state.generation.count);
-
-  // Reset generation count when user signs in
-  useEffect(() => {
-    if (user) {
-      dispatch(resetCount());
-    }
-  }, [user, dispatch]);
-
-  // Load user's sessions from Firebase when authenticated
-  useEffect(() => {
-    const loadUserSessions = async () => {
-      if (user) {
-        try {
-          const loadedSessions = await getUserSessions(user.uid);
-          dispatch(setSessions(loadedSessions));
-
-          // Load the most recent session
-          if (loadedSessions.length > 0) {
-            dispatch(setCurrentSession(loadedSessions[0]));
-          }
-        } catch (error) {
-          console.error('Error loading sessions:', error);
-        }
-      }
-    };
-
-    loadUserSessions();
-  }, [user, dispatch]);
-
-  // Save sessions to Firebase when authenticated
-  useEffect(() => {
-    if (user && sessions.length > 0) {
-      // Save current session to Firebase
-      const currentSession = sessions.find(s => s.id === currentSessionId);
-      if (currentSession) {
-        saveDesignSession({
-          ...currentSession,
-          lastImage: currentImage || null,
-          history: history
-        });
-      }
-    }
-  }, [sessions, currentSessionId, history, currentImage, user]);
 
   // Create initial session if none exist
   useEffect(() => {
@@ -86,14 +39,9 @@ export default function Home() {
         history: []
       };
 
-      // Save to Firebase if authenticated
-      if (user) {
-        saveDesignSession(newSession);
-      }
-
       dispatch(addSession(newSession));
     }
-  }, [sessions.length, currentSessionId, user, dispatch]);
+  }, [sessions.length, currentSessionId, dispatch]);
 
   const createNewSession = async () => {
     // Don't allow creating a new session if current one is empty
@@ -110,25 +58,10 @@ export default function Home() {
       history: []
     };
 
-    // Save to Firebase if authenticated
-    if (user) {
-      await saveDesignSession(newSession);
-    }
-
     dispatch(addSession(newSession));
   };
 
   const handleUpdateHistory = async (newEntry: HistoryEntry) => {
-    // Upload image to Firebase Storage if authenticated
-    if (user) {
-      try {
-        const imageUrl = await uploadImage(newEntry.output, user.uid, currentSessionId || '');
-        newEntry.output = imageUrl;
-      } catch (error) {
-        console.error('Error uploading image:', error);
-      }
-    }
-
     dispatch(addHistoryEntry(newEntry));
   };
 
@@ -139,18 +72,8 @@ export default function Home() {
 
   const confirmDelete = async () => {
     if (!deleteSession) return;
-
-    try {
-      // Delete from Firebase if authenticated
-      if (user) {
-        await updateDesignSession(deleteSession.id, { deleted: true });
-      }
-
-      dispatch(removeSession(deleteSession.id));
-      setDeleteSession(null);
-    } catch (error) {
-      console.error('Error deleting session:', error);
-    }
+    dispatch(removeSession(deleteSession.id));
+    setDeleteSession(null);
   };
 
   return (
@@ -158,7 +81,6 @@ export default function Home() {
       {/* Left Sidebar - Chat Sessions */}
       <div className="w-64 border-r border-gray-200 overflow-y-auto bg-neutral-100">
         <div className="p-4">
-
           <Button
             onClick={createNewSession}
             className={cn(

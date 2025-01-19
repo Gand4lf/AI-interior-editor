@@ -36,17 +36,6 @@ export default function ImageEditor({
     const [maskImage, setMaskImage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    const handleLogin = async () => {
-        const auth = getAuth();
-        const provider = new GoogleAuthProvider();
-        try {
-            await signInWithPopup(auth, provider);
-            console.log('User signed in');
-        } catch (error) {
-            console.error('Error signing in:', error);
-        }
-    };
-
     const handleSubmit = async (value: string) => {
         if (!value.trim()) return;
 
@@ -54,11 +43,6 @@ export default function ImageEditor({
         setError(null);
 
         try {
-            if (generationCount <= 0) {
-                handleLogin(); // Prompt user to log in
-                return;
-            }
-
             if (!currentImage) {
                 const response = await fetch('/api/replicate/generate-image', {
                     method: 'POST',

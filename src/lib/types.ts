@@ -10,5 +10,4 @@ export interface DesignSession {
     lastImage: string | null;
     history: HistoryEntry[];
     timestamp: Date;
-    deleted?: boolean;
 } 
