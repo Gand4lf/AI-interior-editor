@@ -30,7 +30,7 @@ export function AuthDialog({ isOpen, onClose }: AuthDialogProps) {
     };
 
     return (
-        <DialogClose open={isOpen} onOpenChange={onClose}>
+        <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Continue with AIchitect</DialogTitle>
