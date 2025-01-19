@@ -9,8 +9,7 @@ import { ConfirmationDialog } from './components/ui/confirmation-dialog';
 import { Button } from './components/ui/button';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { getUserSessions, saveDesignSession, updateDesignSession, uploadImage } from '@/lib/firebase/firebaseUtils';
-import type { DesignSession } from '../lib/types';
-import type { HistoryEntry } from '@/lib/types/history';
+import type { DesignSession, HistoryEntry } from '../lib/types';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import {
   setSessions,
@@ -106,7 +105,6 @@ export default function Home() {
     const newSession: DesignSession = {
       id: Date.now().toString(),
       name: `Design ${sessions.length + 1}`,
-      userId: user?.uid || '',
       timestamp: new Date(),
       lastImage: null,
       history: []
